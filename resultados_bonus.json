@@ -1,0 +1,76 @@
+[
+    {
+        "pagina": "https://quotes.toscrape.com",
+        "titulo": "Quotes to Scrape",
+        "links": [
+            "https://quotes.toscrape.com/tag/simile/page/1",
+            "https://quotes.toscrape.com/tag/aliteracy/page/1",
+            "https://quotes.toscrape.com/tag/friends",
+            "https://quotes.toscrape.com/tag/change/page/1",
+            "https://quotes.toscrape.com/tag/live/page/1",
+            "https://quotes.toscrape.com/author/Albert-Einstein",
+            "https://quotes.toscrape.com/page/2",
+            "https://quotes.toscrape.com/tag/adulthood/page/1",
+            "https://quotes.toscrape.com/tag/humor/page/1",
+            "https://quotes.toscrape.com/tag/miracle/page/1"
+        ],
+        "headers": {
+            "h1": [
+                "Quotes to Scrape"
+            ],
+            "h2": [
+                "Top Ten tags"
+            ],
+            "h3": []
+        },
+        "paragrafos": [
+            "Login",
+            "Quotes by:GoodReads.com",
+            "Made with❤byZyte"
+        ]
+    },
+    {
+        "pagina": "https://quotes.toscrape.com/login",
+        "titulo": "Quotes to Scrape",
+        "links": [
+            "https://quotes.toscrape.com/login",
+            "https://quotes.toscrape.com"
+        ],
+        "headers": {
+            "h1": [
+                "Quotes to Scrape"
+            ],
+            "h2": [],
+            "h3": []
+        },
+        "paragrafos": [
+            "Login",
+            "Quotes by:GoodReads.com",
+            "Made with❤byZyte"
+        ]
+    },
+    {
+        "pagina": "https://quotes.toscrape.com/author/Albert-Einstein",
+        "titulo": "Quotes to Scrape",
+        "links": [
+            "https://quotes.toscrape.com/login",
+            "https://quotes.toscrape.com"
+        ],
+        "headers": {
+            "h1": [
+                "Quotes to Scrape"
+            ],
+            "h2": [],
+            "h3": [
+                "Albert Einstein"
+            ]
+        },
+        "paragrafos": [
+            "Login",
+            "Born:March 14, 1879in Ulm, Germany",
+            "Description:",
+            "Quotes by:GoodReads.com",
+            "Made with❤byZyte"
+        ]
+    }
+]

@@ -3,9 +3,7 @@ from urllib.parse import urlparse
 
 
 def carregar_robots(url):
-    """
-    Obtém e processa o ficheiro robots.txt do domínio.
-    """
+
     dominio = urlparse(url)
     robots_link = f"{dominio.scheme}://{dominio.netloc}/robots.txt"
 
@@ -22,9 +20,7 @@ def carregar_robots(url):
 
 
 def permitido(url, parser):
-    """
-    Confirma se a página pode ser visitada.
-    """
+    
     agente = "MeuCrawlerAcademico"
 
     if parser is None:

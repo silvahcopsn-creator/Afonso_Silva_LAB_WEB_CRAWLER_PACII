@@ -1,11 +1,11 @@
-from crawler import iniciar_crawl
+from crawler import crawl_avancado
 
 
 def main():
-    url_inicial = "https://example.com"
+    url_inicial = "https://quotes.toscrape.com"
     limite_paginas = 3
 
-    resultado = iniciar_crawl(url_inicial, limite_paginas)
+    resultado = crawl_avancado(url_inicial, limite_paginas)
 
     print("\nResumo:")
     for pagina in resultado:

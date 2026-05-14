@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-from robots_checker import carregar_robots, permitido
+from robots import carregar_robots, permitido
 
 
 def crawl_avancado(url_base, limite, mesmo_dominio=True):

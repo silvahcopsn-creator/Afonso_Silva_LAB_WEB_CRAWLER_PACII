@@ -1,105 +1,90 @@
 import json
 import time
 import requests
+import matplotlib.pyplot as plt
+import networkx as nx
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from robots_checker import carregar_robots, permitido
+from urllib.parse import urljoin, urlparse
+from robots import carregar_robots, permitido
 
 
-def extrair_links(html, pagina_atual):
-    """
-    Retorna todos os links encontrados numa página.
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    encontrados = []
-
-    for link in soup.find_all("a", href=True):
-        url_completa = urljoin(pagina_atual, link["href"])
-        encontrados.append(url_completa)
-
-    return encontrados
+def normalizar(url):
+    parsed = urlparse(url)
+    return f"{parsed.scheme}://{parsed.netloc}{parsed.path.rstrip('/')}"
 
 
-def obter_titulo(html):
-    """
-    Extrai o título da página.
-    """
-    soup = BeautifulSoup(html, "html.parser")
-
-    if soup.title:
-        return soup.title.text.strip()
-
-    return "Sem título"
-
-
-def guardar_json(dados, ficheiro="resultados.json"):
-    """
-    Guarda os resultados em JSON.
-    """
-    with open(ficheiro, "w", encoding="utf-8") as f:
-        json.dump(dados, f, indent=4, ensure_ascii=False)
-
-
-def iniciar_crawl(url_base, limite):
-    """
-    Executa o crawler.
-    """
+def crawl_avancado(url_base, limite=10, mesmo_dominio=True):
+    fila = [normalizar(url_base)]
     visitadas = set()
-    fila = [url_base]
-    paginas = []
+    resultados = []
 
-    parser_robots = carregar_robots(url_base)
+    dominio = urlparse(url_base).netloc
+    grafo = nx.DiGraph()
+    robots = carregar_robots(url_base)
 
     while fila and len(visitadas) < limite:
-
         url = fila.pop(0)
 
-        if url in visitadas:
+        if url in visitadas or not permitido(url, robots):
             continue
 
-        if not permitido(url, parser_robots):
-            print(f"Acesso negado pelo robots.txt: {url}")
-            continue
-
-        print(f"A analisar: {url}")
+        print(f"A visitar: {url}")
 
         try:
-            resposta = requests.get(
-                url,
-                headers={"User-Agent": "MeuCrawlerAcademico/1.0"},
-                timeout=8
-            )
+            r = requests.get(url, headers={"User-Agent": "Crawler/1.0"}, timeout=10)
+            soup = BeautifulSoup(r.text, "html.parser")
 
-            resposta.raise_for_status()
+            titulo = soup.title.text.strip() if soup.title else "Sem título"
 
-            titulo = obter_titulo(resposta.text)
-            links = extrair_links(resposta.text, url)
+            links = set()
 
-            paginas.append({
+            for a in soup.find_all("a", href=True):
+                link = normalizar(urljoin(url, a["href"]))
+
+                if mesmo_dominio and urlparse(link).netloc != dominio:
+                    continue
+
+                links.add(link)
+
+                if link not in visitadas and link not in fila:
+                    fila.append(link)
+
+            headers = {
+                f"h{i}": list({h.get_text(strip=True) for h in soup.find_all(f"h{i}")})
+                for i in range(1, 4)
+            }
+
+            paragrafos = [p.get_text(strip=True) for p in soup.find_all("p")][:5]
+
+            resultados.append({
                 "pagina": url,
                 "titulo": titulo,
-                "links": links[:10]
+                "links": list(links)[:10],
+                "headers": headers,
+                "paragrafos": paragrafos
             })
 
-            for l in links:
-                if l not in visitadas and l not in fila:
-                    fila.append(l)
+            grafo.add_node(url, label=titulo[:25])
+
+            for l in list(links)[:10]:
+                grafo.add_edge(url, l)
 
             visitadas.add(url)
-
             time.sleep(1)
 
-        except requests.RequestException as erro:
-            print(f"Erro na página {url}: {erro}")
+        except Exception as e:
+            print(f"Erro: {e}")
 
-    guardar_json(paginas)
+    with open("resultados_bonus.json", "w", encoding="utf-8") as f:
+        json.dump(resultados, f, indent=4, ensure_ascii=False)
 
-    print(f"\nProcesso terminado: {len(paginas)} páginas guardadas.")
-    return paginas
+    plt.figure(figsize=(10, 8))
+    pos = nx.spring_layout(grafo)
+    nx.draw(grafo, pos, with_labels=False, node_size=500, arrows=True)
+    nx.draw_networkx_labels(grafo, pos, nx.get_node_attributes(grafo, "label"), font_size=7)
 
+    plt.title("Grafo de Navegação")
+    plt.savefig("grafo_navegacao.png")
+    plt.show()
 
-if __name__ == "__main__":
-    url_inicio = "https://example.com"
-    numero_maximo = 3
-
-    iniciar_crawl(url_inicio, numero_maximo)
+    return resultados
